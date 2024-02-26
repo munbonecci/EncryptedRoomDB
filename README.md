@@ -31,7 +31,8 @@ including use cases and view model to obtain the data
 ## Built with
 
 - [Kotlin](https://kotlinlang.org/) - For coding.
-- [Room DB](https://developer.android.com/training/data-storage/room) -For Room database
+- [Room DB](https://developer.android.com/training/data-storage/room) - For Room database
+- [SQLCipher](https://github.com/sqlcipher/android-database-sqlcipher) - For DB encryption
 - [KSP](https://developer.android.com/build/migrate-to-ksp) Kotlin Symbol Processing
 - Jetpack
     - [Navigation Component](https://developer.android.com/guide/navigation/navigation-getting-started)
