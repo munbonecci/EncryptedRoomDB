@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">EncryptedRoomDB</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_button">Add Button</string>
+    <string name="delete_button">Delete button</string>
+    <string name="welcome_user">Welcome User:</string>
+    <string name="icon">icon</string>
+</resources>
