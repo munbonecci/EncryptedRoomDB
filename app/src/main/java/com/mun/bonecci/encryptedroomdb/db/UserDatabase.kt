@@ -5,6 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.mun.bonecci.encryptedroomdb.data.User
+import com.mun.bonecci.encryptedroomdb.db.cipher.PassPhraseUtils
+import com.mun.bonecci.encryptedroomdb.db.cipher.SQLCipherUtils
+import net.sqlcipher.database.SupportFactory
 
 /**
  * Room database class representing the user database.
@@ -24,23 +27,41 @@ abstract class UserDatabase : RoomDatabase() {
     companion object {
         // Database instance variable
         private var instance: UserDatabase? = null
+        private const val DATABASE_NAME = "user_database.db"
 
         /**
-         * Returns the singleton instance of the UserDatabase.
+         * Singleton pattern to obtain an instance of the encrypted UserDatabase.
+         * If the database is unencrypted, it migrates the database to an encrypted one.
          *
          * @param context The application context.
-         * @return The UserDatabase instance.
+         * @return An instance of the UserDatabase.
          */
         @Synchronized
         fun getInstance(context: Context): UserDatabase {
-            if (instance == null) {
-                // Create database instance if it doesn't exist
-                instance = Room.databaseBuilder(
-                    context.applicationContext, UserDatabase::class.java,
-                    "user_database"
-                ).fallbackToDestructiveMigration().build()
+            // Get the user passphrase and convert it to a byte array
+            val userPassphrase = PassPhraseUtils.getPassphrase(context)
+            val passphrase = userPassphrase.toByteArray()
+
+            // Check the state of the database encryption
+            val state = SQLCipherUtils.getDatabaseState(context, DATABASE_NAME)
+
+            // Create a SupportFactory using the passphrase
+            val factory = SupportFactory(passphrase)
+
+            // Migrate the database to an encrypted one if it is currently unencrypted
+            if (state == SQLCipherUtils.State.UNENCRYPTED) {
+                SQLCipherUtils.migrateToEncryptedDatabase(DATABASE_NAME, context, userPassphrase)
             }
+
+            // Create or retrieve the database instance
+            if (instance == null) {
+                instance = Room.databaseBuilder(
+                    context.applicationContext, UserDatabase::class.java, DATABASE_NAME
+                ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
+            }
+
             return instance!!
         }
+
     }
 }
